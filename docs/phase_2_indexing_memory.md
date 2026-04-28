@@ -1,20 +1,40 @@
 # Phase 2 — Indexing / memory
 
-Phase 2 consumes Markdown from `data/markdown/`, writes **chunk JSON**, **deterministic embeddings**, a **FAISS** index on disk, retriever hooks, and **trace** JSON for observability.
+Phase 2 reads Markdown from `data/markdown/`, emits **chunks**, **sentence embeddings**, a **global FAISS** index + **mapping JSON**, and a **trace file for every transformation**.
 
-## Steps
+## Chunking (`fixed_word_window`)
 
-1. **Chunk** — Sliding character windows per file (`configs/settings.yaml`: `chunk.max_chars`, `chunk.overlap_chars`). Each chunk gets a stable id `{stem}:{index:05d}`.
-2. **Embed** — Deterministic hash-derived vectors (normalized for cosine-style inner product search). No external API calls.
-3. **Vector store** — `faiss.IndexFlatIP` on L2-normalized vectors; sidecar `meta.json` maps row order to chunk ids/previews.
-4. **Artifacts** — `data/chunks/*.json`, `data/embeddings/matrix.npy`, `data/vectors/index.faiss`, `data/vectors/meta.json`, `data/traces/index_last.json`.
+`chunk_text` splits normalized text on whitespace into word lists, then emits fixed-length windows (`chunk_size` words, default 500). Each window keeps a stable **`chunk_id`** (`chunk_0000`, …), **`start_word` / `end_word`**, and the joined text—so downstream graph provenance stays explicit.
 
-## CLI
+## Embeddings
 
-`pdf-index` rebuilds the corpus index from all `*.md` inputs.
+`embed_chunks` uses **`sentence_transformers`** with **`all-MiniLM-L6-v2`**. Each chunk gets:
 
-`pdf-query` embeds a query string with the **same** deterministic embedder and reads `data/vectors/` for top-k rows.
+- one **uuid** (`id`) for the stored vector row
+- **`chunk_id`** copied from chunking for cross-artifact linkage
+- a **parallel trace** payload (preview, model id, indexes)
+
+Artifacts: `data/embeddings/{doc_id}.json` (vectors + trace + model name).
+
+## Vector store
+
+`build_index` stacks all embedding vectors across documents into **`faiss.IndexFlatL2`**, writes **`data/vectors/index.faiss`**, and **`data/vectors/map.json`** with `{ "ids": [...], "records": [...] }` where each record holds `vector_id`, `chunk_id`, and full **`text`** for round-tripping.
+
+## Tracing (required)
+
+Every step writes JSON under **`data/traces/`**:
+
+| Trace file | Meaning |
+|------------|---------|
+| `{doc}_chunking` | Strategy, window size, count, chunk file path |
+| `{doc}_embedding` | Model, vector count, embedding file path |
+| `vectorstore` | FAISS path, map path, dims, totals |
+
+## Query
+
+`search(query, k)` embeds the query with the **same model**, runs FAISS, and resolves rows through **`map.json`**. The `pdf-query` CLI prints **`json.dumps`**.
 
 ## Operational notes
 
-Replace the embedder with a real model when semantic quality matters; until then, retrieval remains **reproducible plumbing**, not benchmarks.
+- Empty Markdown yields **zero** chunks; embedding files may be empty lists; **`vectorstore`** trace records `count: 0` if nothing was indexed.
+- Run commands from **any cwd**—paths resolve to the repo root via **`pdf_core.config.repo_root()`**.

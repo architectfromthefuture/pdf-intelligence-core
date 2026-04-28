@@ -20,6 +20,6 @@ Preserve a **narrow, reproducible** document pipeline: ingestion → chunked ind
 | CLI | Module |
 |-----|--------|
 | `pdf-ingest` | `pdf_core.ingest.pipeline` |
-| `pdf-index` | `pdf_core.index.pipeline` |
+| `pdf-index` | `pdf_core.index.pipeline.run_indexing` |
 | `pdf-graph` | `pdf_core.graph.pipeline` |
 | `pdf-query` | `pdf_core.index.retriever` |

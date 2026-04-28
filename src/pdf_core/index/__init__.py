@@ -1,18 +1,22 @@
-from pdf_core.index.chunker import chunk_markdown_file
-from pdf_core.index.embedder import encode_texts
-from pdf_core.index.pipeline import run_index_pipeline
-from pdf_core.index.retriever import retrieve
-from pdf_core.index.vectorstore import VectorMeta, build_index, load_index, load_meta, save_index, save_meta
+from pdf_core.index.chunker import chunk_text
+from pdf_core.index.embedder import embed_chunks, get_model
+from pdf_core.index.pipeline import run_indexing, run_index_pipeline
+from pdf_core.index.retriever import load_index, load_map, search
+from pdf_core.index.trace import write_trace
+from pdf_core.index.vectorstore import INDEX_PATH, MAP_PATH, VECTOR_DIR, build_index
 
 __all__ = [
-    "chunk_markdown_file",
-    "encode_texts",
+    "chunk_text",
+    "embed_chunks",
+    "get_model",
+    "run_indexing",
     "run_index_pipeline",
-    "retrieve",
-    "VectorMeta",
     "build_index",
+    "write_trace",
     "load_index",
-    "load_meta",
-    "save_index",
-    "save_meta",
+    "load_map",
+    "search",
+    "INDEX_PATH",
+    "MAP_PATH",
+    "VECTOR_DIR",
 ]

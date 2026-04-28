@@ -13,11 +13,12 @@ paths:
 chunk:
   max_chars: 1200
   overlap_chars: 100
+  # Phase 2 indexing uses word-window chunking; see run_indexing(chunk_size=…).
 
 embedding:
   dim: 64
-  # Deterministic hashing embedder (no external model). Swap for real embeddings later.
   normalize: true
+  # Defaults for other utilities; Phase 2 uses SentenceTransformers ("all-MiniLM-L6-v2").
 
 retrieve:
   top_k: 8

@@ -1,34 +1,29 @@
-"""Deterministic character windows over normalized Markdown."""
+"""Deterministic fixed word-window chunking (stable chunk_id per window)."""
 
 from __future__ import annotations
 
-from pathlib import Path
+from typing import Any
 
 
-def window_text(text: str, max_chars: int, overlap: int) -> list[str]:
-    text = text.strip()
-    if not text:
-        return []
-    if len(text) <= max_chars:
-        return [text]
-    stride = max(1, max_chars - overlap)
-    out: list[str] = []
-    start = 0
-    while start < len(text):
-        end = min(len(text), start + max_chars)
-        out.append(text[start:end])
-        if end >= len(text):
-            break
-        start += stride
-    return out
+def chunk_text(text: str, chunk_size: int = 500) -> dict[str, Any]:
+    words = text.split()
 
+    chunks: list[dict[str, Any]] = []
 
-def chunk_markdown_file(md_path: Path, *, max_chars: int, overlap: int) -> dict:
-    raw = md_path.read_text(encoding="utf-8")
-    parts = window_text(raw, max_chars, overlap)
-    stem = md_path.stem
-    chunks = []
-    for i, body in enumerate(parts):
-        cid = f"{stem}:{i:05d}"
-        chunks.append({"id": cid, "text": body, "ord": i, "source_md": str(md_path.name)})
-    return {"stem": stem, "source_path": str(md_path), "chunks": chunks}
+    for index, start in enumerate(range(0, len(words), chunk_size)):
+        chunk_words = words[start : start + chunk_size]
+        chunks.append(
+            {
+                "chunk_id": f"chunk_{index:04d}",
+                "text": " ".join(chunk_words),
+                "start_word": start,
+                "end_word": start + len(chunk_words),
+            }
+        )
+
+    return {
+        "chunks": chunks,
+        "chunk_size": chunk_size,
+        "total_chunks": len(chunks),
+        "strategy": "fixed_word_window",
+    }

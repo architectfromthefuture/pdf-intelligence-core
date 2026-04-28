@@ -1,9 +1,9 @@
-from pdf_core.index.pipeline import run_index_pipeline
+from pdf_core.index.pipeline import run_indexing
 
 
 def main() -> None:
     print("Starting indexing pipeline...")
-    run_index_pipeline()
+    run_indexing()
 
 
 if __name__ == "__main__":
