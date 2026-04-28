@@ -1,0 +1,23 @@
+# Repository-root relative paths (see src/pdf_core/config.py for resolution)
+paths:
+  inbox: data/inbox
+  markdown: data/markdown
+  audit: data/audit
+  chunks: data/chunks
+  embeddings: data/embeddings
+  vectors: data/vectors
+  traces: data/traces
+  graphs: data/graphs
+  graph_traces: data/graphs/traces
+
+chunk:
+  max_chars: 1200
+  overlap_chars: 100
+
+embedding:
+  dim: 64
+  # Deterministic hashing embedder (no external model). Swap for real embeddings later.
+  normalize: true
+
+retrieve:
+  top_k: 8

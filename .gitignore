@@ -9,5 +9,19 @@ venv/
 .env
 .pytest_cache/
 .ruff_cache/
-*.pdf
-!tests/fixtures/*.pdf
+
+# Run outputs (keep tree via .gitkeep)
+data/inbox/*.pdf
+data/markdown/*.md
+data/audit/*.json
+data/chunks/*
+!data/chunks/.gitkeep
+data/embeddings/*
+!data/embeddings/.gitkeep
+data/vectors/*
+!data/vectors/.gitkeep
+data/traces/*
+!data/traces/.gitkeep
+data/graphs/*.json
+data/graphs/traces/*
+!data/graphs/traces/.gitkeep
