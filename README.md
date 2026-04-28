@@ -1,14 +1,16 @@
 # pdf-intelligence-core
 
-A minimal, observable document intelligence pipeline.
+**Public story — in order:**
 
-This repo turns PDFs into Markdown, Markdown into chunks, chunks into embeddings, embeddings into a searchable vector index, and chunks into a deterministic graph structure.
+1. **Core Ingestion Engine**
+2. **Indexing / Memory Layer**
+3. **Deterministic Graph Structure**
 
-## Why this exists
+That framing is deliberate. It reads less like “I made a PDF tool” and more like **I’m building observable document intelligence from first principles**—each phase adds structure you can open, diff, and rebuild from artifacts.
 
-Most document pipelines jump from PDF straight into embeddings. That makes the system hard to inspect.
+This repo walks that path: PDFs become Markdown and audits, Markdown becomes chunks and traces, chunks become embeddings and a searchable vector map, then chunk files alone yield a deterministic graph with provenance.
 
-This project keeps every transformation visible:
+## Artifact flow
 
 ```txt
 PDF
@@ -19,19 +21,23 @@ PDF
 → graph nodes/edges + provenance
 ```
 
-## Phases
+## Phases (same narrative)
 
-### Phase 1 — Core ingestion engine
+### 1 — Core Ingestion Engine
 
 PDF → validated → extracted → normalized → Markdown + audit.
 
-### Phase 2 — Indexing / memory layer
+### 2 — Indexing / Memory Layer
 
 Markdown → chunks → embeddings → FAISS index + trace artifacts.
 
-### Phase 3 — Graph structure layer
+### 3 — Deterministic Graph Structure
 
 Chunks → regex entities → co-occurrence relationships → graph JSON + per-chunk provenance traces — **from chunk text only** (no raw PDF reads, no embedding vectors passed into the graph, no LLM edge generation).
+
+## Why not “jump straight to vectors”?
+
+Most pipelines bury the early steps; this one keeps **every transformation visible** so you can inspect and reproduce behavior without trusting a black box.
 
 ## Install
 

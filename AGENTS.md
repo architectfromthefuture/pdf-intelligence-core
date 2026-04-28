@@ -1,6 +1,12 @@
 # AGENTS
 
-This repo is a minimal observable document intelligence pipeline.
+This repo is a minimal **observable document intelligence** pipeline. The public story is intentional, in order:
+
+1. **Core Ingestion Engine**
+2. **Indexing / Memory Layer**
+3. **Deterministic Graph Structure**
+
+That order positions the work as systems you can inspect and rebuild from artifacts—not “another PDF script.”
 
 ## Rule
 
