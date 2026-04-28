@@ -11,7 +11,7 @@ Phase 1 turns PDFs in `data/inbox/` into **normalized Markdown** plus **structur
 
 ## CLI
 
-`pdf-ingest` invokes `run_pipeline()` and processes every `*.pdf` found in the inbox.
+`pdf-core-ingest` invokes `run_pipeline()` and processes every `*.pdf` found in the inbox.
 
 ## Operational notes
 

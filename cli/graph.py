@@ -2,7 +2,7 @@ from pdf_core.graph.pipeline import run_graph_pipeline
 
 
 def main() -> None:
-    print("Building graph from chunk artifacts...")
+    print("Starting graph pipeline...")
     run_graph_pipeline()
 
 

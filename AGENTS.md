@@ -2,24 +2,24 @@
 
 ## Intent
 
-Preserve a **narrow, reproducible** document pipeline: ingestion → chunked index → deterministic graph artifacts. Prefer **truthful, inspectable files** over feature sprawl.
+Keep a **narrow, reproducible** document pipeline: ingestion → chunked index → embeddings/FAISS → **deterministic graph from chunk text**. Prefer **truthful artifacts on disk** over feature sprawl.
 
 ## Do
 
-- Keep paths consistent with `configs/settings.yaml` and `pdf_core.config.load_settings()`.
-- When changing behavior, update **tests** and the relevant `docs/phase_*.md` summary.
-- Treat `data/` as local run output; never commit secrets or private PDFs.
+- Preserve **Phase 3 invariants**: no PDF ingress, no embeddings, no LLM edges — only **`data/chunks/*.json`**.
+- When changing behavior, update **tests** and the matching `docs/phase_*.md` section.
+- Keep `configs/settings.yaml` consistent with **`pdf_core.config.load_settings()`** for ingestion paths.
 
 ## Do not
 
-- Add a web app, Docker, cloud infra, external databases, or LLM API calls in the default path without an explicit project decision.
-- Paste large raw design notes into `README.md`—summarize in `docs/` instead.
+- Add a web UI, Docker, hosted DBs, or LLM-based graph construction in the default path without an explicit project decision.
+- Paste raw design notes into `README.md` — summarize in `docs/`.
 
-## Useful entrypoints
+## Entry points (console scripts)
 
 | CLI | Module |
 |-----|--------|
-| `pdf-ingest` | `pdf_core.ingest.pipeline` |
-| `pdf-index` | `pdf_core.index.pipeline.run_indexing` |
-| `pdf-graph` | `pdf_core.graph.pipeline` |
-| `pdf-query` | `pdf_core.index.retriever` |
+| `pdf-core-ingest` | `pdf_core.ingest.pipeline` |
+| `pdf-core-index` | `pdf_core.index.pipeline` |
+| `pdf-core-query` | `pdf_core.index.retriever` |
+| `pdf-core-graph` | `pdf_core.graph.pipeline` |

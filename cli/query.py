@@ -22,7 +22,7 @@ def main(argv: list[str] | None = None) -> None:
     mpath = Path(MAP_PATH)
     if not idx.exists() or not mpath.exists():
         repo = repo_root()
-        print(f"No index under {repo / 'data/vectors'}. Run `pdf-index` after `pdf-ingest`.", file=sys.stderr)
+        print(f"No index under {repo / 'data/vectors'}. Run `pdf-core-index` after `pdf-core-ingest`.", file=sys.stderr)
         raise SystemExit(2)
 
     result = search(args.query, k=args.k)

@@ -1,51 +1,116 @@
 # pdf-intelligence-core
 
-A **small, observable, file-backed** pipeline: PDFs in `data/inbox/` become normalized Markdown, audited JSON, chunked JSON, sentence embeddings (**SentenceTransformers**), a local **FAISS** index with traces, and a **deterministic chunk graph** exported as JSON. Everything stays on disk for inspection—no hosted database or web UI.
+A minimal, observable document intelligence pipeline.
 
-## Phases at a glance
+This repo turns PDFs into Markdown, Markdown into chunks, chunks into embeddings, embeddings into a searchable vector index, and chunks into a deterministic graph structure.
 
-| Phase | Responsibility | Inspect |
-|-------|-----------------|--------|
-| **1 — Ingestion** | Validate (PyMuPDF), extract (`pymupdf4llm` → fallback `pdfplumber`), normalize, audits | `data/markdown/*.md`, `data/audit/*.json` |
-| **2 — Index / memory** | Word-window chunks, embeddings (`all-MiniLM-L6-v2`), **FAISS** L2, per-step traces | `data/chunks/*.json`, `data/embeddings/*.json`, `data/vectors/index.faiss`, `data/vectors/map.json`, `data/traces/` |
-| **3 — Graph** | Structural **NEXT_CHUNK** edges from chunk order | `data/graphs/nodes.json`, `data/graphs/edges.json`, `data/graphs/traces/` |
+## Why this exists
 
-See `docs/architecture.md` and `docs/phase_*.md` for detail.
+Most document pipelines jump from PDF straight into embeddings. That makes the system hard to inspect.
 
-## Flow
+This project keeps every transformation visible:
 
 ```txt
 PDF
-→ validated → extracted → normalized Markdown → audited
-→ chunked → embedded → FAISS index → retrievable
-→ deterministic graph projection (chunks only)
+→ Markdown + audit
+→ chunks + trace
+→ embeddings + trace
+→ vector index + mapping
+→ graph nodes/edges + provenance
 ```
 
-## Quickstart
+## Phases
+
+### Phase 1 — Core ingestion engine
+
+PDF → validated → extracted → normalized → Markdown + audit.
+
+### Phase 2 — Indexing / memory layer
+
+Markdown → chunks → embeddings → FAISS index + trace artifacts.
+
+### Phase 3 — Graph structure layer
+
+Chunks → regex entities → co-occurrence relationships → graph JSON + per-chunk provenance traces — **from chunk text only** (no raw PDF reads, no embedding vectors passed into the graph, no LLM edge generation).
+
+## Install
 
 ```bash
-python3 -m venv .venv && source .venv/bin/activate
-pip install -e ".[dev]"   # or: pip install -r requirements.txt
+python3 -m venv .venv
+source .venv/bin/activate
+python -m pip install --upgrade pip
+pip install -e .
 ```
 
-1. Drop one or more PDFs into `data/inbox/`.
-2. `pdf-ingest` — writes Markdown + audit JSON (`configs/settings.yaml` paths for Phase 1).
-3. `pdf-index` — word-window chunks, per-doc embedding JSON, global `index.faiss` + `map.json`, traces (`*_chunking`, `*_embedding`, `vectorstore`).
-4. `pdf-graph` — builds `nodes.json` / `edges.json`.
-5. `pdf-query "your question"` — JSON results over **`map.json` + local FAISS** (downloads the embedding model on first use).
-
-## Honest limits
-
-- **First index/query run** downloads **`all-MiniLM-L6-v2`** (network, disk). Pin versions in deployments if needed.
-- **No OCR guarantee** beyond what extractors recover; scanned pages may yield little text.
-- **FAISS** uses **`IndexFlatL2`** — exact, fine for small corpora.
-
-## Development
+## Run ingestion
 
 ```bash
-pytest
-ruff check .
+mkdir -p data/inbox
+cp path/to/file.pdf data/inbox/
+pdf-core-ingest
 ```
+
+Outputs:
+
+- `data/markdown/file.md`
+- `data/audit/file.json`
+
+## Run indexing
+
+```bash
+pdf-core-index
+```
+
+Outputs:
+
+- `data/chunks/file.json`
+- `data/embeddings/file.json`
+- `data/vectors/index.faiss`
+- `data/vectors/map.json`
+- `data/traces/*.json`
+
+## Query
+
+```bash
+pdf-core-query "what is this document about?"
+```
+
+## Build graph
+
+```bash
+pdf-core-graph
+```
+
+Outputs:
+
+- `data/graphs/nodes.json`
+- `data/graphs/edges.json`
+- `data/graphs/graph_index.json`
+- `data/graphs/traces/*.json`
+
+Paths resolve from the repository root regardless of shell directory.
+
+## Design principles
+
+- **Deterministic first** — same chunks → same graph (regex-based entities, enumerated co-edges).
+- **Observable transformations** — JSON/Markdown/FAISS on disk.
+- **No hidden black boxes** — traces on chunk and embedding steps (Phase 2), per chunk (Phase 3).
+- **Every artifact rebuildable** — pipeline steps are repeatable from stored inputs.
+- **Every edge should have provenance** — edges carry `source_chunk_id`; nodes carry provenance ids.
+- **No LLM-generated graph edges in v0.1.**
+
+## What this is not
+
+- Not a production RAG platform.
+- Not a full knowledge graph system.
+- Not an LLM reasoning engine.
+- Not a UI.
+
+It is the core pipeline skeleton.
+
+## Roadmap
+
+- Phase 4 — CLI/query polish, richer chunking strategies, richer metadata, graph inspection commands, evaluation harness, optional downstream LLM cleanup **above** these artifacts — not wired into Phase 3 edge construction today.
 
 ## License
 

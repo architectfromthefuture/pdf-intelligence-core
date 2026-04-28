@@ -1,17 +1,26 @@
-"""Graph build traces."""
+"""Phase 3 traces (chunk-level extraction provenance)."""
 
 from __future__ import annotations
 
 import json
 from datetime import UTC, datetime
 from pathlib import Path
-from typing import Any
+
+from pdf_core.config import repo_root
 
 
-def write_graph_trace(payload: dict[str, Any], traces_dir: Path, name: str = "graph_last") -> Path:
-    traces_dir.mkdir(parents=True, exist_ok=True)
+def traces_dir() -> Path:
+    return repo_root() / "data/graphs/traces"
+
+
+def write_trace(name: str, payload: dict) -> Path:
+    td = traces_dir()
+    td.mkdir(parents=True, exist_ok=True)
+
     body = dict(payload)
     body["timestamp"] = datetime.now(UTC).isoformat()
-    out = traces_dir / f"{name}.json"
+
+    out = td / f"{name}.json"
     out.write_text(json.dumps(body, indent=2), encoding="utf-8")
+
     return out

@@ -1,27 +1,17 @@
-"""Minimal graph schema (JSON-serializable)."""
-
-from __future__ import annotations
-
 from dataclasses import dataclass
-from typing import Literal
-
-NodeType = Literal["CHUNK"]
-EdgeType = Literal["NEXT_CHUNK"]
 
 
 @dataclass
-class NodeRecord:
+class Node:
     id: str
-    type: NodeType
-    doc_stem: str
-    ord: int
-    text_preview: str
+    label: str
+    source_chunk_id: str
 
 
 @dataclass
-class EdgeRecord:
+class Edge:
     id: str
     source: str
     target: str
-    kind: EdgeType
-    weight: float
+    relation: str
+    source_chunk_id: str

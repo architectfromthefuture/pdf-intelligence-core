@@ -32,7 +32,7 @@ Every step writes JSON under **`data/traces/`**:
 
 ## Query
 
-`search(query, k)` embeds the query with the **same model**, runs FAISS, and resolves rows through **`map.json`**. The `pdf-query` CLI prints **`json.dumps`**.
+`search(query, k)` embeds the query with the **same model**, runs FAISS, and resolves rows through **`map.json`**. The **`pdf-core-query`** CLI prints **`json.dumps`**.
 
 ## Operational notes
 
