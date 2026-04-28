@@ -48,6 +48,25 @@ python -m pip install --upgrade pip
 pip install -e .
 ```
 
+## Docker runtime
+
+Run the pipeline in a container while `./data/` on the host stays the **persistent artifact layer** (same layout as native runs). Reproducibility: pinned base image + `requirements.txt` + editable install; **no** baked `data/` blobs in the image.
+
+```bash
+docker compose build
+docker compose up -d
+docker exec -it pdf_intelligence_core bash
+
+python -m cli ingest
+python -m cli index
+python -m cli query "what is this document about?"
+python -m cli graph
+
+docker compose down
+```
+
+Details: **`docs/docker_runtime.md`**.
+
 ## Run ingestion
 
 ```bash

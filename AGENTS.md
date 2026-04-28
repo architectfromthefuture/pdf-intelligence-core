@@ -12,7 +12,7 @@ That order positions the work as systems you can inspect and rebuild from artifa
 
 Keep the system phase-based and inspectable.
 
-Do not add LLM-generated graph edges, databases, APIs, dashboards, Docker, or cloud deployment unless explicitly requested.
+Do not add LLM-generated graph edges, hosted databases-as-product, dashboards-as-product, bespoke APIs-as-product, or cloud deployment pipelines as first-class features unless explicitly requested. **Docker** in this repo is the reproducible **runtime** for the same pipeline—not a second data store.
 
 ## Core story
 
@@ -53,8 +53,18 @@ Graph must be reconstructable from chunk artifacts only.
 | `pdf-core-index` | `pdf_core.index.pipeline` |
 | `pdf-core-query` | `pdf_core.index.retriever` |
 | `pdf-core-graph` | `pdf_core.graph.pipeline` |
+| **`python -m cli …`** | `cli/__main__.py` — `ingest` · `index` · `query` · `graph` |
 
 Maintenance: when behavior changes, update tests and matching `docs/phase_*.md`. Keep `configs/settings.yaml` aligned with `pdf_core.config.load_settings()` for ingestion paths.
+
+## Docker rule
+
+- **Container** = ephemeral compute (reproducible Python + system deps).
+- **Host-mounted `./data`** (mapped to `/app/data` in Compose) = persistent artifact layer.
+- **Do not** bake generated `data/**` outputs into images (see `.dockerignore`).
+- Default mode stays **manual** (`docker compose up -d` → `docker exec` → `python -m cli …`). No watcher automation, databases, APIs, or UIs baked in unless explicitly requested.
+
+Further detail: `docs/docker_runtime.md`.
 
 ---
 
@@ -83,7 +93,7 @@ find data -maxdepth 3 -type f | sort
 ## Do not
 
 - Add a web app or UI.
-- Add FastAPI, Docker, or databases yet (unless explicitly requested).
+- Add FastAPI or databases-as-product (Dockerized **runtime only** + mounted `data/` are in scope).
 - Add LLM graph extraction, OpenAI calls, or LangChain to the default pipeline.
 - Add cloud deployment or dashboards.
 - Overclaim that this is production RAG.

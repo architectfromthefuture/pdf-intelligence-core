@@ -1,0 +1,17 @@
+version: "3.9"
+
+services:
+  pdf-core:
+    build: .
+    container_name: pdf_intelligence_core
+
+    volumes:
+      - ./data:/app/data
+      - ./configs:/app/configs
+
+    working_dir: /app
+
+    command: ["tail", "-f", "/dev/null"]
+
+    stdin_open: true
+    tty: true
